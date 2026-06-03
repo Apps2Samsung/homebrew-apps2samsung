@@ -1,13 +1,13 @@
 cask "samsung-jellyfin-installer" do
-  version "2.3.0.2"
+  version "2.3.1.0"
 
   on_arm do
-    sha256 "a74c1e54d53688eff153d96bfa93b1cb05ea4cb1871befb668abb7bd2ba1fc93"
+    sha256 "02c114898883255d50636f41e9018f6477565b8256a9f64d44f7be6269503135"
 
     url "https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer/releases/download/v#{version}/Jellyfin2Samsung-v#{version}-macos-arm64.dmg"
   end
   on_intel do
-    sha256 "9e8a3632920be11456accc1b0f2181c673dbf88b2fd1a6723a033cfa29df61a4"
+    sha256 "3d5e3307ea90717d6512626ad9526c50f160cae767e3a9347d5d80a44ee6dd9a"
 
     url "https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer/releases/download/v#{version}/Jellyfin2Samsung-v#{version}-macos-x64.dmg"
   end
