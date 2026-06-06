@@ -1,0 +1,101 @@
+name: bump-cask-apps2samsung
+
+# Keeps Casks/apps2samsung.rb in sync with the latest stable release of
+# Apps2Samsung/Apps2Samsung: bumps the version and recomputes both dmg
+# SHA256s, then commits to main. Mirrors the winget tap's bump workflow.
+
+on:
+  schedule:
+    - cron: '30 9 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Update even when the version already matches'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bump-cask-apps2samsung
+  cancel-in-progress: false
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Check versions
+        id: v
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          latest="$(gh release view --repo Apps2Samsung/Apps2Samsung --json tagName -q .tagName | sed 's/^v//')"
+          current="$(grep -oE 'version "[0-9.]+"' Casks/apps2samsung.rb | grep -oE '[0-9.]+')"
+
+          echo "Latest:  $latest"
+          echo "Current: $current"
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+
+          # Only move forward (sort -V guards against upstream retags)
+          highest="$(printf '%s\n%s\n' "$current" "$latest" | sort -V | tail -1)"
+          if { [ "$latest" != "$current" ] && [ "$highest" = "$latest" ]; } || [ "${{ inputs.force }}" = "true" ]; then
+            echo "update=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "update=false" >> "$GITHUB_OUTPUT"
+            echo "Cask already up to date."
+          fi
+
+      - name: Update cask
+        if: steps.v.outputs.update == 'true'
+        env:
+          VERSION: ${{ steps.v.outputs.latest }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          base="https://github.com/Apps2Samsung/Apps2Samsung/releases/download/v${VERSION}"
+          curl -fsSL -o arm.dmg "$base/Apps2Samsung-v${VERSION}-macos-arm64.dmg"
+          curl -fsSL -o x64.dmg "$base/Apps2Samsung-v${VERSION}-macos-x64.dmg"
+
+          sha_arm="$(sha256sum arm.dmg | cut -d' ' -f1)"
+          sha_x64="$(sha256sum x64.dmg | cut -d' ' -f1)"
+          echo "arm64: $sha_arm"
+          echo "x64:   $sha_x64"
+
+          f=Casks/apps2samsung.rb
+          sed -i "s/^  version \"[0-9.]*\"/  version \"${VERSION}\"/" "$f"
+          # First sha256 in the file sits in the on_arm block, second in on_intel.
+          awk -v a="$sha_arm" -v b="$sha_x64" '
+            /sha256 "/ {
+              n++
+              if (n == 1) sub(/sha256 "[0-9a-fA-F]*"/, "sha256 \"" a "\"")
+              else if (n == 2) sub(/sha256 "[0-9a-fA-F]*"/, "sha256 \"" b "\"")
+            }
+            { print }' "$f" > tmp && mv tmp "$f"
+
+          # Sanity: version and both hashes must now be present
+          grep -q "version \"${VERSION}\"" "$f"
+          grep -q "$sha_arm" "$f"
+          grep -q "$sha_x64" "$f"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$f"
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+          git commit -m "apps2samsung ${VERSION}"
+          git push origin HEAD:main
