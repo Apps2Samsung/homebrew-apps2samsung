@@ -1,13 +1,13 @@
 cask "apps2samsung" do
-  version "2.5.5"
+  version "2.5.6"
 
   on_arm do
-    sha256 "c244f997e5051d8c3b5fce233711b985bb350744a549e906a823eeab0abeb414"
+    sha256 "c3cbec86e541ebf1738a94f5895a26144dfc3bb4964807f249de69486c446e72"
 
     url "https://github.com/Apps2Samsung/Apps2Samsung/releases/download/v#{version}/Apps2Samsung-v#{version}-macos-arm64.dmg"
   end
   on_intel do
-    sha256 "8a0b804f2ec0332ce38ade94386602d77828b490f9ca8c5b6ba5ca50b2b501b3"
+    sha256 "9233b6965a68299d6a02da192b6936565411a181d7c3a3cd3095ff7509dda9b5"
 
     url "https://github.com/Apps2Samsung/Apps2Samsung/releases/download/v#{version}/Apps2Samsung-v#{version}-macos-x64.dmg"
   end
