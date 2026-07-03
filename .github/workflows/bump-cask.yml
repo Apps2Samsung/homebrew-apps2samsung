@@ -33,8 +33,7 @@ jobs:
         with:
           ref: main
 
-      - name: Check versions
-        id: v
+      - name: Update cask
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
@@ -46,27 +45,21 @@ jobs:
 
           echo "Latest:  $latest"
           echo "Current: $current"
-          echo "latest=$latest" >> "$GITHUB_OUTPUT"
 
           # Only move forward (sort -V guards against upstream retags)
           highest="$(printf '%s\n%s\n' "$current" "$latest" | sort -V | tail -1)"
-          if { [ "$latest" != "$current" ] && [ "$highest" = "$latest" ]; } || [ "${{ inputs.force }}" = "true" ]; then
-            echo "update=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "update=false" >> "$GITHUB_OUTPUT"
-            echo "Cask already up to date."
+          if [ "$highest" != "$latest" ] && [ "${{ inputs.force }}" != "true" ]; then
+            echo "Latest tag ($latest) is older than current ($current). Skipping."
+            exit 0
           fi
 
-      - name: Update cask
-        if: steps.v.outputs.update == 'true'
-        env:
-          VERSION: ${{ steps.v.outputs.latest }}
-        shell: bash
-        run: |
-          set -euo pipefail
-
+          VERSION="$latest"
           base="https://github.com/Apps2Samsung/Apps2Samsung/releases/download/v${VERSION}"
+          
+          echo "Downloading $base/Apps2Samsung-v${VERSION}-macos-arm64.dmg"
           curl -fsSL -o arm.dmg "$base/Apps2Samsung-v${VERSION}-macos-arm64.dmg"
+          
+          echo "Downloading $base/Apps2Samsung-v${VERSION}-macos-x64.dmg"
           curl -fsSL -o x64.dmg "$base/Apps2Samsung-v${VERSION}-macos-x64.dmg"
 
           sha_arm="$(sha256sum arm.dmg | cut -d' ' -f1)"
