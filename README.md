@@ -1,4 +1,4 @@
-# homebrew-Samsung-Jellyfin-Installer
+# homebrew-Apps2Samsung
 
 Install Samsung Jellyfin Installer with:
 
