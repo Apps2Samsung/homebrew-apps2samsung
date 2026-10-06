@@ -6,6 +6,12 @@ Install Samsung Jellyfin Installer with:
     brew trust Apps2Samsung/homebrew-apps2samsung
     brew install --cask Apps2Samsung/homebrew-apps2samsung/Apps2Samsung
 
+> **Migrating from `jellyfin2samsung/samsung-jellyfin-installer`?** That tap no longer exists, which causes
+> `No available formula or cask with the name "jellyfin2samsung/samsung-jellyfin-installer/samsung-jellyfin-installer"`.
+> Remove it and use the commands above instead:
+>
+>     brew untap jellyfin2samsung/samsung-jellyfin-installer
+
 Because Apps2Samsung is an open-source tool and is not signed with a paid Apple Developer certificate, macOS Gatekeeper will flag the app the first time you try to open it. 
 
 You can safely bypass this warning using any of the following three methods. You will only need to do this once.
