@@ -14,11 +14,15 @@ cask "samsung-jellyfin-installer" do
 
   name "Samsung Jellyfin Installer"
   desc "Jellyfin client for Samsung Tizen TVs (renamed to Apps2Samsung)"
-  homepage "https://apps2samsung.madebypatrick.nl"
+  homepage "https://apps2samsung.madebypatrick.nl/"
 
   deprecate! date: "2026-06-06", because: "it was renamed to Apps2Samsung", replacement_cask: "apps2samsung"
 
-  depends_on macos: :big_sur
+  depends_on :macos
 
   app "Jellyfin2Samsung.app"
+
+  postflight_steps do
+    run "/usr/bin/xattr", args: ["-rd", "com.apple.quarantine", "{{appdir}}/Jellyfin2Samsung.app"]
+  end
 end

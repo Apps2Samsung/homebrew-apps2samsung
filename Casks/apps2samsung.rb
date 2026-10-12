@@ -14,14 +14,18 @@ cask "apps2samsung" do
 
   name "Apps2Samsung"
   desc "Install any app on Samsung Tizen devices (TVs, projectors, smart monitors)"
-  homepage "https://apps2samsung.madebypatrick.nl"
+  homepage "https://apps2samsung.madebypatrick.nl/"
 
   livecheck do
     url "https://github.com/Apps2Samsung/Apps2Samsung"
     strategy :github_latest
   end
 
-  depends_on macos: :big_sur
+  depends_on :macos
 
   app "Apps2Samsung.app"
+
+  postflight_steps do
+    run "/usr/bin/xattr", args: ["-rd", "com.apple.quarantine", "{{appdir}}/Apps2Samsung.app"]
+  end
 end

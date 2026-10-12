@@ -1,17 +1,17 @@
 # homebrew-Apps2Samsung
 
-Install Samsung Jellyfin Installer with:
+Install Apps2Samsung with:
 
     brew tap Apps2Samsung/homebrew-apps2samsung
     brew trust Apps2Samsung/homebrew-apps2samsung
     brew install --cask Apps2Samsung/homebrew-apps2samsung/Apps2Samsung
 
-Because Apps2Samsung is an open-source tool and is not signed with a paid Apple Developer certificate, macOS Gatekeeper will flag the app the first time you try to open it. 
+Because Apps2Samsung is an open-source tool and is not signed with a paid Apple Developer certificate, the cask automatically removes the quarantine attribute upon installation.
 
-You can safely bypass this warning using any of the following three methods. You will only need to do this once.
+If macOS Gatekeeper flags the app the first time you try to open it, you can safely bypass this warning using any of the following three methods. You will only need to do this once.
 
 #### Method 1: The Quick Way (Recommended)
-1. Open Finder and locate the extracted `Apps2Samsung.app` (e.g., in your Applications or Downloads folder).
+1. Open Finder and locate `Apps2Samsung.app` (e.g., in your Applications folder).
 2. **Right-click** (or hold `Control` and click) on the app.
 3. Select **Open** from the context menu.
 4. A warning prompt will appear, but it will now include an **Open** button. Click it to launch the app.
@@ -24,8 +24,9 @@ You can safely bypass this warning using any of the following three methods. You
 5. Click **Open Anyway** and confirm to launch the app.
 
 #### Method 3: Via Terminal (Advanced)
-If you prefer the command line, you can manually remove the quarantine attribute that macOS applies to files downloaded from the internet:
+If you prefer the command line, or if the quarantine attribute was not removed automatically, you can manually remove it:
 1. Open the **Terminal** app.
 2. Run the following command (adjust the path if the app is not in your Applications folder):
    ```bash
    xattr -dr com.apple.quarantine /Applications/Apps2Samsung.app
+   ```
